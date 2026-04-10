@@ -7,6 +7,7 @@ public class InputManager : MonoBehaviour
     private PlayerInput.OnFootActions onFoot;
     private PlayerMotor motor;
     private PlayerLook look;
+    
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
     {
@@ -14,6 +15,8 @@ public class InputManager : MonoBehaviour
         onFoot=playerInput.OnFoot;
         motor = GetComponent<PlayerMotor>();
         look = GetComponent<PlayerLook>();
+        onFoot.Grapple.started  += _ => motor.StartGrapple();
+        onFoot.Grapple.canceled += _ => motor.StopGrapple();
     }
 
     // Update is called once per frame
@@ -32,6 +35,11 @@ public class InputManager : MonoBehaviour
         {
             motor.ProcessJump();
         }
+        if (onFoot.Slide.WasPressedThisFrame())
+        {
+            motor.StartSlide();
+        }
+        
     }
 
     private void OnEnable()
