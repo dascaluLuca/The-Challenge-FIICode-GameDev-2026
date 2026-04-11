@@ -178,17 +178,18 @@ public class PlayerMotor : MonoBehaviour
     }
     public void StartGrapple()
 {
+    int layerMask = ~LayerMask.GetMask("NoGrapple");
     Ray ray = playerCamera.ScreenPointToRay(Mouse.current.position.ReadValue());
 
-    if (Physics.Raycast(ray, out RaycastHit hit))
+    if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, layerMask))
     {
+        Debug.Log("Grappled: " + hit.collider.gameObject.name + " layer: " + hit.collider.gameObject.layer);
         playerVelocity = Vector3.zero;
         isGrappling = true;
         grapplePoint = hit.point;
         ropeRenderer.enabled = true;
     }
 }
-
     public void StopGrapple()
     {
         isGrappling = false;
