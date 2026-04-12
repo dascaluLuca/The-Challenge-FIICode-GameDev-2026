@@ -117,8 +117,8 @@ public class PlayerMotor : MonoBehaviour
         {
             //gravity
             // Drain horizontal velocity when not grappling
-            playerVelocity.x = Mathf.Lerp(playerVelocity.x, 0f, Time.deltaTime * 8f);
-            playerVelocity.z = Mathf.Lerp(playerVelocity.z, 0f, Time.deltaTime * 8f);
+            playerVelocity.x = Mathf.Lerp(playerVelocity.x, 0f, Time.deltaTime * 1.2f);
+            playerVelocity.z = Mathf.Lerp(playerVelocity.z, 0f, Time.deltaTime * 1.2f);
             playerVelocity.y += Gravity*Time.deltaTime;
             if(isGrounded && playerVelocity.y < 0)
             {
@@ -128,29 +128,29 @@ public class PlayerMotor : MonoBehaviour
         }
     }
 
-    public void StartSlide()
+   public void StartSlide()
+{
+    // Grapple cancel
+    if (isGrappling)
     {
-
-        // Cancel grapple if active
-        if (isGrappling) StopGrapple();
-
-        // Only slide if grounded and actually moving
-        if (isSliding) return;
-
-        isSliding = true;
-        currentSlideSpeed = SlideSpeed;
-
-        // Lock in the forward direction at the moment of sliding
-        slideDirection = transform.forward;
-
-        // Shrink the collider so the player crouches
+        StopGrapple();
+        playerVelocity = new Vector3(0, -40f, 0);
         controller.height = SlideCrouchHeight;
         controller.center = new Vector3(0, SlideCrouchHeight / 2f, 0);
-
-        // Slam downward velocity so player drops fast
-        playerVelocity.y = -20f;
+        isSliding = true;
+        currentSlideSpeed = 0f;
+        return;
     }
 
+    // Normal ground slide
+    if (!isGrounded || isSliding) return;
+    isSliding = true;
+    currentSlideSpeed = SlideSpeed;
+    slideDirection = transform.forward;
+    controller.height = SlideCrouchHeight;
+    controller.center = new Vector3(0, SlideCrouchHeight / 2f, 0);
+    playerVelocity.y = -20f;
+}
     public void StopSlide()
     {
         if (!isSliding) return;
