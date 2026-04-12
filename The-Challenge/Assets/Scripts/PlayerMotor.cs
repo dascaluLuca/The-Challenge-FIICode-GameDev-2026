@@ -7,7 +7,7 @@ using NUnit.Framework;
 using UnityEngine.InputSystem.Controls;
 public class PlayerMotor : MonoBehaviour
 {
-    //testtest
+    
     private bool isGrounded;
     private bool isDiving = false;
     private CharacterController controller;
