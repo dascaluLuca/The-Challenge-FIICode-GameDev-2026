@@ -9,6 +9,7 @@ public class PlayerMotor : MonoBehaviour
 {
     //testtest
     private bool isGrounded;
+    private bool isDiving = false;
     private CharacterController controller;
     private Vector3 playerVelocity;
     public float Speed=5f;
@@ -81,6 +82,20 @@ public class PlayerMotor : MonoBehaviour
     //recieve inputs from InputManager.cs and apply on Character Controller component
     public void ProcessMove(Vector2 input)
     {
+        if (isDiving)
+        {
+            playerVelocity.y -= 40f * Time.deltaTime; // accelerate downward
+            controller.Move(playerVelocity * Time.deltaTime);
+
+            // Stop dive when grounded
+            if (isGrounded)
+            {
+                isDiving = false;
+                controller.height = originalHeight;
+                controller.center = originalCenter;
+            }
+            return; // skip all other movement while diving
+        }
         if (!isSliding)
         {
             Vector3 moveDirection = Vector3.zero;
@@ -131,19 +146,26 @@ public class PlayerMotor : MonoBehaviour
    public void StartSlide()
 {
     // Grapple cancel
-    if (isGrappling)
+    if (!isGrounded)
     {
-        StopGrapple();
-        playerVelocity = new Vector3(0, -40f, 0);
+        if (isGrappling)
+        {
+            isDiving = true;
+            StopGrapple();
+        }
+        else
+        {
+            isDiving = true;
+        }
+        playerVelocity = new Vector3(0, -30f, 0);
         controller.height = SlideCrouchHeight;
         controller.center = new Vector3(0, SlideCrouchHeight / 2f, 0);
-        isSliding = true;
-        currentSlideSpeed = 0f;
         return;
     }
 
+
     // Normal ground slide
-    if (!isGrounded || isSliding) return;
+    if (isSliding) return;
     isSliding = true;
     currentSlideSpeed = SlideSpeed;
     slideDirection = transform.forward;
@@ -183,7 +205,7 @@ public class PlayerMotor : MonoBehaviour
 
     if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, layerMask))
     {
-        Debug.Log("Grappled: " + hit.collider.gameObject.name + " layer: " + hit.collider.gameObject.layer);
+        //Debug.Log("Grappled: " + hit.collider.gameObject.name + " layer: " + hit.collider.gameObject.layer);
         playerVelocity = Vector3.zero;
         isGrappling = true;
         grapplePoint = hit.point;
@@ -192,6 +214,7 @@ public class PlayerMotor : MonoBehaviour
 }
     public void StopGrapple()
     {
+        
         isGrappling = false;
         ropeRenderer.enabled = false;
         // Keep momentum but cap it so you don't get launched into orbit

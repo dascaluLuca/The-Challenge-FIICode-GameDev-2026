@@ -18,7 +18,11 @@ public class InputManager : MonoBehaviour
         onFoot.Grapple.started  += _ => motor.StartGrapple();
         onFoot.Grapple.canceled += _ => motor.StopGrapple();
     }
-
+    void Start()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+    }
     // Update is called once per frame
     void FixedUpdate()
     {
