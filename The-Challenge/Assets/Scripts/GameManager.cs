@@ -16,6 +16,7 @@ public class GameManager : MonoBehaviour
 
     public void RespawnPlayer()
     {
+        GameUI.Instance.OnDeath();
         // Must disable CharacterController before teleporting or Unity ignores it
         controller.enabled = false;
         playerMotor.transform.position = respawnPoint.position;
